@@ -8,7 +8,7 @@ class UserRoles(models.TextChoices):
     MODERATOR = "moderator", "Moderator"
 
 
-class User(AbstractUser, PermissionsMixin):
+class User(AbstractUser):
     role = models.CharField(
         max_length=20,
         choices=UserRoles.choices,
