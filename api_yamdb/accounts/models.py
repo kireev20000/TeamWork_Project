@@ -1,27 +1,30 @@
-from django.contrib.auth.models import AbstractUser, PermissionsMixin
+from django.contrib.auth.models import AbstractUser
 from django.db import models
 
 
-class UserRoles(models.TextChoices):
-    ADMIN = "admin", "Admin"
-    USER = "user", "User"
-    MODERATOR = "moderator", "Moderator"
-
-
 class User(AbstractUser):
+    """Custom user model."""
+    USER_ROLE = (
+        ('user', 'user'),
+        ('moderator', 'moderator'),
+        ('admin', 'admin'),
+    )
     role = models.CharField(
         max_length=20,
-        choices=UserRoles.choices,
-        default=UserRoles.USER,
+        choices=USER_ROLE,
+        default='user',
     )
     email = models.EmailField(
-        max_length=255,
+        max_length=254,
         unique=True,
         blank=False,
     )
-    username = models.CharField(max_length=255, unique=True)
+    username = models.CharField(max_length=150, unique=True)
+    bio = models.TextField(max_length=255, blank=True)
+    first_name = models.CharField(max_length=255, blank=True)
+    last_name = models.CharField(max_length=255, blank=True)
     confirmation_token = models.CharField(
-        max_length=255,
+        max_length=20,
         blank=False,
         null=True,
         unique=True,
@@ -31,15 +34,15 @@ class User(AbstractUser):
 
     @property
     def is_user(self):
-        return self.role == UserRoles.USER
+        return self.role == 'user'
 
     @property
     def is_admin(self):
-        return self.role == UserRoles.ADMIN
+        return self.role == 'admin'
 
     @property
     def is_moderator(self):
-        return self.role == UserRoles.MODERATOR
+        return self.role == 'moderator'
 
     def __str__(self):
-        return self.username
+        return f'{self.username}'
