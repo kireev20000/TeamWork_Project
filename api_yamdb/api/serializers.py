@@ -38,7 +38,7 @@ class TitleSerializer(serializers.ModelSerializer):
             'id', 'name', 'year', 'description', 'genre', 'category',
         )
         read_only_fields = (
-            'id', 'name', 'year', 'description', 'genre', 'category',
+            'id', 'name', 'year', 'description',
         )
 
 
@@ -62,6 +62,7 @@ class TitleCRUDSerializer(serializers.ModelSerializer):
         )
 
     def validate_year(self, value):
+        """Проверка чтобы год не был больше текущего."""
         if value > datetime.datetime.now().year:
             raise serializers.ValidationError(
                 'Год не может быть больше текущего!')
