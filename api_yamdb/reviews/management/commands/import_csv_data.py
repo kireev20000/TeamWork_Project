@@ -8,10 +8,10 @@ from reviews.models import Categories, Genres, Title, TitleGenres
 
 
 # TODO: не забыть добавить остальные модели как будут готовы!!
-
+# TODO: сделать экспешн менее базовым!!
 
 class Command(BaseCommand):
-    """Кастомная management-команда для импорта cvs файлов."""
+    """Кастомная management-команда для импорта csv файлов."""
 
     def handle(self, *args, **options):
 
