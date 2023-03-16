@@ -2,11 +2,18 @@
 import datetime
 
 from rest_framework import serializers
+from accounts.models import User
 from reviews.models import Categories, Genres, Title
-from django.contrib.auth import get_user_model
 
 
-User = get_user_model()
+class SendTokenSerializer(serializers.Serializer):
+    email = serializers.EmailField(required=True)
+    username = serializers.CharField(required=True)
+
+
+class GetGWTSerializer(serializers.Serializer):
+    username = serializers.CharField(required=True)
+    confirmation_code = serializers.CharField(required=True)
 
 
 class CategoriesSerializer(serializers.ModelSerializer):
