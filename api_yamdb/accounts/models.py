@@ -15,11 +15,11 @@ class User(AbstractUser):
         default='user',
     )
     email = models.EmailField(
-        max_length=255,
+        max_length=254,
         unique=True,
         blank=False,
     )
-    username = models.CharField(max_length=255, unique=True)
+    username = models.CharField(max_length=150, unique=True)
     bio = models.TextField(max_length=255, blank=True)
     first_name = models.CharField(max_length=255, blank=True)
     last_name = models.CharField(max_length=255, blank=True)
