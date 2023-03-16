@@ -45,4 +45,4 @@ class User(AbstractUser):
         return self.role == 'moderator'
 
     def __str__(self):
-        return self.username
+        return f'{self.username}'
