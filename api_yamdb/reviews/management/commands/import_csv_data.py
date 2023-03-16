@@ -1,4 +1,4 @@
-"""Кастомная management-команда для импорта cvs файлов."""
+"""Кастомная management-команда для импорта csv файлов."""
 
 import csv
 
@@ -24,7 +24,7 @@ class Command(BaseCommand):
             # Review: 'review.csv',
             # Comments: 'comments.csv',
         }
-        answer = input('Операция импорта сотрет данные из ваших моделей. Продолжать? (y/n)')
+        answer = input('Операция импорта сотрет данные из ваших моделей. Продолжить? (y/n)')
         if answer == 'y':
             for key in cvs_files.keys():
                 key.objects.all().delete()
