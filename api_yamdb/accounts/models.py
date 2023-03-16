@@ -24,7 +24,7 @@ class User(AbstractUser):
     first_name = models.CharField(max_length=255, blank=True)
     last_name = models.CharField(max_length=255, blank=True)
     confirmation_token = models.CharField(
-        max_length=255,
+        max_length=20,
         blank=False,
         null=True,
         unique=True,
