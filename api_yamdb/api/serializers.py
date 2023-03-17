@@ -6,6 +6,19 @@ from accounts.models import User
 from reviews.models import Categories, Genres, Title
 
 
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        fields = (
+            'first_name',
+            'last_name',
+            'username',
+            'bio',
+            'email',
+            'role'
+        )
+        model = User
+
+
 class SendTokenSerializer(serializers.Serializer):
     email = serializers.EmailField(required=True)
     username = serializers.CharField(required=True)
