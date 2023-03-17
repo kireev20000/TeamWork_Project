@@ -8,18 +8,25 @@ from rest_framework.decorators import api_view
 from rest_framework import viewsets, filters, mixins, status
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import AccessToken
+from rest_framework.views import APIView
+from django.contrib.auth.decorators import login_required
 
 from accounts.models import User
 from reviews.models import Categories, Genres, Title
 from .filters import TitleFilters
-from .permissions import IsAdminOrReadOnly
+from .permissions import (
+    IsAdmin,
+    IsAdminOrReadOnly,
+    IsAuthorOrAdminOrModerator,
+)
 from .serializers import (
     SendTokenSerializer,
     GetGWTSerializer,
     CategoriesSerializer,
     GenresSerializer,
     TitleSerializer,
-    TitleCRUDSerializer
+    TitleCRUDSerializer,
+    UserSerializer,
 )
 
 
@@ -86,6 +93,34 @@ def get_jwt(request):
         serializer.errors,
         status=status.HTTP_422_UNPROCESSABLE_ENTITY
     )
+
+
+class UserViewSet(viewsets.ModelViewSet):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    lookup_field = 'username'
+    permission_classes = [IsAdmin]
+    filter_backends = [filters.SearchFilter]
+    search_fields = ['user__username', ]
+
+
+class APIUser(APIView):
+    @login_required
+    def get(self, request):
+        user = get_object_or_404(User, id=request.user.id)
+        serializer = UserSerializer(user)
+        return Response(serializer.data)
+
+    @login_required
+    def patch(self, request):
+        user = get_object_or_404(User, id=request.user.id)
+        serializer = UserSerializer(user, data=request.data, partial=True)
+        if (
+                serializer.is_valid()
+                and user.username == request.data.get('username')):
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class CategoryViewSet(mixins.ListModelMixin,

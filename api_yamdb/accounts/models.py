@@ -1,5 +1,23 @@
-from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.db import models
+
+
+class UserManager(BaseUserManager):
+    def create_user(self, email, username, **kwargs):
+        user = self.model(email=email, username=username, **kwargs)
+        user.save()
+        return user
+
+    def create_superuser(self, email, username, **kwargs):
+        user = self.model(
+            email=email,
+            username=username,
+            is_staff=True,
+            is_superuser=True,
+            **kwargs
+        )
+        user.save()
+        return user
 
 
 class User(AbstractUser):
@@ -31,6 +49,7 @@ class User(AbstractUser):
         editable=False,
     )
     REQUIRED_FIELDS = ['email']
+    objects = UserManager()
 
     @property
     def is_user(self):
