@@ -17,9 +17,20 @@ def validate_username(value):
     return value
 
 
+def validate_role(value):
+    roles = ['user', 'admin', 'moderator']
+    if value not in roles:
+        raise serializers.ValidationError('Invalid role')
+    return value
+
+
 class UserSerializer(serializers.ModelSerializer):
     first_name = serializers.CharField(max_length=150)
     last_name = serializers.CharField(max_length=150)
+    username = serializers.CharField(
+        max_length=150,
+        validators=[validate_username]
+    )
 
     class Meta:
         fields = (
@@ -37,6 +48,11 @@ class UserSerializer(serializers.ModelSerializer):
 class AdminSerializer(serializers.ModelSerializer):
     first_name = serializers.CharField(max_length=150)
     last_name = serializers.CharField(max_length=150)
+    role = serializers.CharField(validators=[validate_role])
+    username = serializers.CharField(
+        max_length=150,
+        validators=[validate_username]
+    )
 
     class Meta:
         fields = (
