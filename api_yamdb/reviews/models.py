@@ -1,6 +1,7 @@
 """Модели для приложения reviews."""
 
 from django.db import models
+from django.core.validators import MaxValueValidator, MinValueValidator
 
 
 class Categories(models.Model):
@@ -102,3 +103,77 @@ class TitleGenres(models.Model):
 
     def __str__(self):
         return f'{self.title}-{self.genre}'
+
+
+class Review(models.Model):
+    title = models.ForeignKey(
+        Title,
+        on_delete=models.CASCADE,
+        related_name='reviews',
+        verbose_name='произведение'
+    )
+    text = models.CharField(
+        max_length=200
+    )
+    author = models.ForeignKey(
+        on_delete=models.CASCADE,
+        related_name='reviews',
+        verbose_name='автор'
+    )
+    score = models.IntegerField(
+        'оценка',
+        validators=(
+            MinValueValidator(1),
+            MaxValueValidator(10)
+        ),
+        error_messages={'validators': 'Оценка от 1 до 10!'}
+    )
+    pub_date = models.DateTimeField(
+        'дата публикации',
+        auto_now_add=True,
+        db_index=True
+    )
+
+    class Meta:
+        verbose_name = 'Отзыв'
+        verbose_name_plural = 'Отзывы'
+        constraints = [
+            models.UniqueConstraint(
+                fields=('title', 'author', ),
+                name='unique review'
+            )]
+        ordering = ('pub_date',)
+
+    def __str__(self):
+        return self.text
+
+
+class Comment(models.Model):
+    review = models.ForeignKey(
+        Review,
+        on_delete=models.CASCADE,
+        related_name='comments',
+        verbose_name='отзыв'
+    )
+    text = models.CharField(
+        'текст комментария',
+        max_length=200
+    )
+    author = models.ForeignKey(
+        on_delete=models.CASCADE,
+        related_name='comments',
+        verbose_name='автор'
+    )
+    pub_date = models.DateTimeField(
+        'дата публикации',
+        auto_now_add=True,
+        db_index=True
+    )
+
+    class Meta:
+        verbose_name = 'Комментарий'
+        verbose_name_plural = 'Комментарии'
+
+    def __str__(self):
+        return self
+    
