@@ -1,5 +1,6 @@
 """Сериализаторы для приложения Api."""
 import datetime
+import re
 
 from rest_framework import serializers
 from accounts.models import User
@@ -7,6 +8,13 @@ from reviews.models import Categories, Genres, Title, Comment, Review
 
 from django.shortcuts import get_object_or_404
 from django.core.exceptions import ValidationError
+
+
+def validate_username(value):
+    regex = r'^[\w.@+-]+$'
+    if value == 'me' or not re.match(regex, value):
+        raise serializers.ValidationError('Invalid username format')
+    return value
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -47,6 +55,7 @@ class SendTokenSerializer(serializers.Serializer):
     username = serializers.CharField(
         required=True,
         max_length=150,
+        validators=[validate_username]
     )
 
 
