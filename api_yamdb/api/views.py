@@ -9,7 +9,9 @@ from rest_framework import viewsets, filters, mixins, status
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import AccessToken
 from rest_framework.views import APIView
-from django.contrib.auth.decorators import login_required
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.decorators import action
+from rest_framework.filters import SearchFilter
 
 from accounts.models import User
 from reviews.models import Categories, Genres, Title
@@ -27,6 +29,7 @@ from .serializers import (
     TitleSerializer,
     TitleCRUDSerializer,
     UserSerializer,
+    AdminSerializer
 )
 
 
@@ -56,6 +59,12 @@ def send_token(request):
             )
         )
         user = User.objects.filter(email=email).first()
+        user_check = User.objects.filter(username=username).first()
+        if ((user or user_check) and user != user_check) or username == 'me':
+            return Response(
+                serializer.errors,
+                status=status.HTTP_400_BAD_REQUEST
+            )
         if not user:
             User.objects.create_user(
                 email=email,
@@ -66,9 +75,11 @@ def send_token(request):
         mail_subject = 'Код подтверждения на YAMDB'
         message = f'Ваш код подтверждения: {random_string}'
         send_mail(mail_subject, message, EMAIL_SENDER, [email])
-        return Response(
-            f'Код отправлен на адрес {email}', status=status.HTTP_200_OK
-        )
+        answer = {
+            'email': email,
+            'username': username,
+        }
+        return Response(answer, status=status.HTTP_200_OK)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -91,36 +102,40 @@ def get_jwt(request):
         )
     return Response(
         serializer.errors,
-        status=status.HTTP_422_UNPROCESSABLE_ENTITY
+        status=status.HTTP_400_BAD_REQUEST
     )
 
 
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
+    permission_classes = (IsAuthenticated, IsAdmin,)
     lookup_field = 'username'
-    permission_classes = [IsAdmin]
-    filter_backends = [filters.SearchFilter]
-    search_fields = ['user__username', ]
+    filter_backends = (SearchFilter, )
+    search_fields = ('username', )
 
-
-class APIUser(APIView):
-    @login_required
-    def get(self, request):
-        user = get_object_or_404(User, id=request.user.id)
-        serializer = UserSerializer(user)
-        return Response(serializer.data)
-
-    @login_required
-    def patch(self, request):
-        user = get_object_or_404(User, id=request.user.id)
-        serializer = UserSerializer(user, data=request.data, partial=True)
-        if (
-                serializer.is_valid()
-                and user.username == request.data.get('username')):
+    @action(
+        methods=['GET', 'PATCH'],
+        detail=False,
+        permission_classes=(IsAuthenticated,),
+        url_path='me')
+    def get_current_user_info(self, request):
+        serializer = UserSerializer(request.user)
+        if request.method == 'PATCH':
+            if request.user.is_admin:
+                serializer = AdminSerializer(
+                    request.user,
+                    data=request.data,
+                    partial=True)
+            else:
+                serializer = UserSerializer(
+                    request.user,
+                    data=request.data,
+                    partial=True)
+            serializer.is_valid(raise_exception=True)
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response(serializer.data)
 
 
 class CategoryViewSet(mixins.ListModelMixin,
