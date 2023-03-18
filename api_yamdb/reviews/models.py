@@ -21,7 +21,7 @@ class Categories(models.Model):
         ordering = ('name',)
 
     def __str__(self):
-        return self.slug
+        return self.name
 
 
 class Genres(models.Model):
@@ -86,7 +86,7 @@ class Title(models.Model):
 
 
 class TitleGenres(models.Model):
-    """Вспомогательная таблица многое-ко-многим - жанры и произведеня."""
+    """Вспомогательная таблица многое-ко-многим - произведения и жанры."""
     title = models.ForeignKey(
         Title,
         on_delete=models.CASCADE,
