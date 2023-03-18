@@ -40,7 +40,7 @@ def send_token(request):
     Sends a confirmation code to the specified email address.
 
     If the email address is not associated, a new user is created.
-    The confirmation code is stored in the user's confirmation_token field.
+    The confirmation code is stored in the user's confirmation_code field.
 
     :param request: The HTTP request containing the email address.
     :return: A HTTP response indicating whether the code was sent successfully.
@@ -61,7 +61,7 @@ def send_token(request):
                 email=email,
                 username=username)
         User.objects.filter(email=email).update(
-            confirmation_token=random_string
+            confirmation_code=random_string
         )
         mail_subject = 'Код подтверждения на YAMDB'
         message = f'Ваш код подтверждения: {random_string}'
@@ -77,9 +77,9 @@ def get_jwt(request):
     serializer = GetGWTSerializer(data=request.data)
     if serializer.is_valid():
         username = serializer.validated_data['username']
-        confirmation_token = serializer.validated_data['confirmation_token']
+        confirmation_code = serializer.validated_data['confirmation_code']
         user = get_object_or_404(User, username=username)
-        if user.confirmation_token != confirmation_token:
+        if user.confirmation_code != confirmation_code:
             return Response(
                 'Неверный код подтверждения',
                 status=status.HTTP_400_BAD_REQUEST
