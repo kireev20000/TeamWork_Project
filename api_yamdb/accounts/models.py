@@ -41,7 +41,6 @@ class User(AbstractUser):
     username = models.CharField(
         max_length=150,
         unique=True,
-        #validators=[RegexValidator(regex=r"^[\\w.@+-]+")]
     )
     bio = models.TextField(max_length=255, blank=True)
     first_name = models.CharField(max_length=255, blank=True)
