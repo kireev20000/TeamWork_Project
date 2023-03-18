@@ -7,6 +7,26 @@ from reviews.models import Categories, Genres, Title
 
 
 class UserSerializer(serializers.ModelSerializer):
+    first_name = serializers.CharField(max_length=150)
+    last_name = serializers.CharField(max_length=150)
+
+    class Meta:
+        fields = (
+            'first_name',
+            'last_name',
+            'username',
+            'bio',
+            'email',
+            'role'
+        )
+        read_only_fields = ('role',)
+        model = User
+
+
+class AdminSerializer(serializers.ModelSerializer):
+    first_name = serializers.CharField(max_length=150)
+    last_name = serializers.CharField(max_length=150)
+
     class Meta:
         fields = (
             'first_name',
@@ -18,10 +38,9 @@ class UserSerializer(serializers.ModelSerializer):
         )
         model = User
 
-
 class SendTokenSerializer(serializers.Serializer):
-    email = serializers.EmailField(required=True)
-    username = serializers.CharField(required=True)
+    email = serializers.EmailField(required=True, max_length=254)
+    username = serializers.CharField(required=True, max_length=150)
 
 
 class GetGWTSerializer(serializers.Serializer):
