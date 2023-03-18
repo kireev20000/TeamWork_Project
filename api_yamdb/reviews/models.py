@@ -3,6 +3,8 @@
 from django.db import models
 from django.core.validators import MaxValueValidator, MinValueValidator
 
+from accounts.models import User
+
 
 class Categories(models.Model):
     """Модель для категорий."""
@@ -116,6 +118,7 @@ class Review(models.Model):
         max_length=200
     )
     author = models.ForeignKey(
+        User,
         on_delete=models.CASCADE,
         related_name='reviews',
         verbose_name='автор'
@@ -160,6 +163,7 @@ class Comment(models.Model):
         max_length=200
     )
     author = models.ForeignKey(
+        User,
         on_delete=models.CASCADE,
         related_name='comments',
         verbose_name='автор'
@@ -176,4 +180,3 @@ class Comment(models.Model):
 
     def __str__(self):
         return self
-    
