@@ -1,5 +1,6 @@
 """Сериализаторы для приложения Api."""
 import datetime
+import re
 
 from rest_framework import serializers
 from accounts.models import User
@@ -38,9 +39,13 @@ class AdminSerializer(serializers.ModelSerializer):
         )
         model = User
 
+
 class SendTokenSerializer(serializers.Serializer):
     email = serializers.EmailField(required=True, max_length=254)
-    username = serializers.CharField(required=True, max_length=150)
+    username = serializers.CharField(
+        required=True,
+        max_length=150,
+    )
 
 
 class GetGWTSerializer(serializers.Serializer):
