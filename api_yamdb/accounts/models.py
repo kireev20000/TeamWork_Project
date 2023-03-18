@@ -1,6 +1,5 @@
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.db import models
-from django.core.validators import RegexValidator
 
 
 class UserManager(BaseUserManager):
@@ -13,6 +12,7 @@ class UserManager(BaseUserManager):
         user = self.model(
             email=email,
             username=username,
+            is_active=True,
             is_staff=True,
             is_superuser=True,
             **kwargs
@@ -61,7 +61,7 @@ class User(AbstractUser):
 
     @property
     def is_admin(self):
-        return self.role == 'admin'
+        return self.role == 'admin' or self.is_superuser
 
     @property
     def is_moderator(self):
