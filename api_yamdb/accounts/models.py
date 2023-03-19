@@ -2,23 +2,6 @@ from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.db import models
 
 
-class UserManager(BaseUserManager):
-    def create_user(self, email, username, **kwargs):
-        user = self.model(email=email, username=username, **kwargs)
-        user.save()
-        return user
-
-    def create_superuser(self, email, username, **kwargs):
-        user = self.create_user(
-            email=email,
-            username=username,
-            **kwargs
-        )
-        user.role = 'admin'
-        user.save()
-        return user
-
-
 class User(AbstractUser):
     """Custom user model."""
     USER_ROLE = (
@@ -53,7 +36,6 @@ class User(AbstractUser):
     is_active = models.BooleanField(default=True)
 
     REQUIRED_FIELDS = ['email']
-    objects = UserManager()
 
     @property
     def is_user(self):
