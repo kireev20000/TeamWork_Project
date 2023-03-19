@@ -101,12 +101,13 @@ class TitleSerializer(serializers.ModelSerializer):
 
     category = CategoriesSerializer(many=False, read_only=True)
     genre = GenresSerializer(many=True, read_only=True)
-    rating = 'заглушка для рейтинга'
+    rating = serializers.IntegerField(source='reviews__score__avg',
+                                      read_only=True)
 
     class Meta:
         model = Title
         fields = (
-            'id', 'name', 'year', 'description', 'genre', 'category',
+            'id', 'name', 'year', 'rating', 'description', 'genre', 'category',
         )
         read_only_fields = (
             'id', 'name', 'year', 'description',
