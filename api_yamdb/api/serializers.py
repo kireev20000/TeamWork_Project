@@ -32,6 +32,7 @@ def validate_dublicates(value):
         raise serializers.ValidationError('Дубликат!')
     return value
 
+
 class UserSerializer(serializers.ModelSerializer):
     first_name = serializers.CharField(
         max_length=150,
