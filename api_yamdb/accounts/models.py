@@ -51,7 +51,7 @@ class User(AbstractUser):
         editable=False,
     )
     is_active = models.BooleanField(default=True)
-    
+
     REQUIRED_FIELDS = ['email']
     objects = UserManager()
 
