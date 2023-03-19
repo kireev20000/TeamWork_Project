@@ -115,7 +115,7 @@ class UserViewSet(viewsets.ModelViewSet):
     lookup_field = 'username'
     filter_backends = (SearchFilter, )
     search_fields = ('username', )
-    http_method_names = ['get', 'post', 'head', 'patch', 'delete']
+    http_method_names = ['get', 'post', 'patch', 'delete']
     pagination_class = LimitOffsetPagination
 
     @action(

@@ -9,14 +9,12 @@ class UserManager(BaseUserManager):
         return user
 
     def create_superuser(self, email, username, **kwargs):
-        user = self.model(
+        user = self.create_user(
             email=email,
             username=username,
-            is_active=True,
-            is_staff=True,
-            is_superuser=True,
             **kwargs
         )
+        user.role = 'admin'
         user.save()
         return user
 
@@ -52,6 +50,8 @@ class User(AbstractUser):
         unique=True,
         editable=False,
     )
+    is_active = models.BooleanField(default=True)
+    
     REQUIRED_FIELDS = ['email']
     objects = UserManager()
 
