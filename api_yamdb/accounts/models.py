@@ -1,24 +1,5 @@
-from django.contrib.auth.models import AbstractUser, BaseUserManager
+from django.contrib.auth.models import AbstractUser
 from django.db import models
-from django.core.validators import RegexValidator
-
-
-class UserManager(BaseUserManager):
-    def create_user(self, email, username, **kwargs):
-        user = self.model(email=email, username=username, **kwargs)
-        user.save()
-        return user
-
-    def create_superuser(self, email, username, **kwargs):
-        user = self.model(
-            email=email,
-            username=username,
-            is_staff=True,
-            is_superuser=True,
-            **kwargs
-        )
-        user.save()
-        return user
 
 
 class User(AbstractUser):
@@ -32,15 +13,19 @@ class User(AbstractUser):
         max_length=20,
         choices=USER_ROLE,
         default='user',
+        blank=True,
     )
     email = models.EmailField(
         max_length=254,
         unique=True,
         blank=False,
+        null=False,
     )
     username = models.CharField(
         max_length=150,
         unique=True,
+        blank=False,
+        null=False,
     )
     bio = models.TextField(max_length=255, blank=True)
     first_name = models.CharField(max_length=255, blank=True)
@@ -52,8 +37,9 @@ class User(AbstractUser):
         unique=True,
         editable=False,
     )
+    is_active = models.BooleanField(default=True)
+
     REQUIRED_FIELDS = ['email']
-    objects = UserManager()
 
     @property
     def is_user(self):
@@ -61,7 +47,7 @@ class User(AbstractUser):
 
     @property
     def is_admin(self):
-        return self.role == 'admin'
+        return self.role == 'admin' or self.is_superuser
 
     @property
     def is_moderator(self):

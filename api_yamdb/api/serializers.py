@@ -17,9 +17,36 @@ def validate_username(value):
     return value
 
 
+def validate_role(value):
+    roles = ['user', 'admin', 'moderator']
+    if value not in roles:
+        raise serializers.ValidationError('Invalid role')
+    return value
+
+
+def validate_dublicates(value):
+    if (
+        User.objects.filter(username__iexact=value).exists()
+        or User.objects.filter(email__iexact=value).exists()
+    ):
+        raise serializers.ValidationError('Дубликат!')
+    return value
+
+
 class UserSerializer(serializers.ModelSerializer):
-    first_name = serializers.CharField(max_length=150)
-    last_name = serializers.CharField(max_length=150)
+    first_name = serializers.CharField(
+        max_length=150,
+        required=False
+    )
+    last_name = serializers.CharField(
+        max_length=150,
+        required=False
+    )
+    username = serializers.CharField(
+        max_length=150,
+        required=True,
+        validators=[validate_username]
+    )
 
     class Meta:
         fields = (
@@ -35,8 +62,24 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class AdminSerializer(serializers.ModelSerializer):
-    first_name = serializers.CharField(max_length=150)
-    last_name = serializers.CharField(max_length=150)
+    first_name = serializers.CharField(
+        max_length=150,
+        required=False
+    )
+    last_name = serializers.CharField(
+        max_length=150,
+        required=False
+    )
+    username = serializers.CharField(
+        max_length=150,
+        required=True,
+        validators=[validate_username, validate_dublicates],
+    )
+    email = serializers.EmailField(
+        max_length=254,
+        required=True,
+        validators=[validate_dublicates]
+    )
 
     class Meta:
         fields = (
@@ -85,12 +128,13 @@ class TitleSerializer(serializers.ModelSerializer):
 
     category = CategoriesSerializer(many=False, read_only=True)
     genre = GenresSerializer(many=True, read_only=True)
-    rating = 'заглушка для рейтинга'
+    rating = serializers.IntegerField(source='reviews__score__avg',
+                                      read_only=True)
 
     class Meta:
         model = Title
         fields = (
-            'id', 'name', 'year', 'description', 'genre', 'category',
+            'id', 'name', 'year', 'rating', 'description', 'genre', 'category',
         )
         read_only_fields = (
             'id', 'name', 'year', 'description',

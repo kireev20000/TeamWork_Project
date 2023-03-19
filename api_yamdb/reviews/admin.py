@@ -29,7 +29,7 @@ class TitleAdmin(admin.ModelAdmin):
     search_fields = ('name', 'year', 'category',)
     list_filter = ('name', 'year', 'category',)
     empty_value_display = '-пусто-'
-    
+
     def get_genre(self, object):
         """Выводит в админку жанр произведения, иначе ошибка."""
         return ',\n'.join((genre.name for genre in object.genre.all()))
