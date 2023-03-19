@@ -13,15 +13,19 @@ class User(AbstractUser):
         max_length=20,
         choices=USER_ROLE,
         default='user',
+        blank=True,
     )
     email = models.EmailField(
         max_length=254,
         unique=True,
         blank=False,
+        null=False,
     )
     username = models.CharField(
         max_length=150,
         unique=True,
+        blank=False,
+        null=False,
     )
     bio = models.TextField(max_length=255, blank=True)
     first_name = models.CharField(max_length=255, blank=True)
