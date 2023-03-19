@@ -46,9 +46,9 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class AdminSerializer(serializers.ModelSerializer):
-    first_name = serializers.CharField(max_length=150)
-    last_name = serializers.CharField(max_length=150)
-    role = serializers.CharField(validators=[validate_role])
+    first_name = serializers.CharField(max_length=150, required=False)
+    last_name = serializers.CharField(max_length=150, required=False)
+    role = serializers.CharField(validators=[validate_role], required=False)
     username = serializers.CharField(
         max_length=150,
         validators=[validate_username]
