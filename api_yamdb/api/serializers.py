@@ -24,11 +24,26 @@ def validate_role(value):
     return value
 
 
+def validate_dublicates(value):
+    if (
+        User.objects.filter(username__iexact=value).exists()
+        or User.objects.filter(email__iexact=value).exists()
+    ):
+        raise serializers.ValidationError('Дубликат!')
+    return value
+
 class UserSerializer(serializers.ModelSerializer):
-    first_name = serializers.CharField(max_length=150)
-    last_name = serializers.CharField(max_length=150)
+    first_name = serializers.CharField(
+        max_length=150,
+        required=False
+    )
+    last_name = serializers.CharField(
+        max_length=150,
+        required=False
+    )
     username = serializers.CharField(
         max_length=150,
+        required=True,
         validators=[validate_username]
     )
 
@@ -46,12 +61,23 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class AdminSerializer(serializers.ModelSerializer):
-    first_name = serializers.CharField(max_length=150, required=False)
-    last_name = serializers.CharField(max_length=150, required=False)
-    role = serializers.CharField(validators=[validate_role], required=False)
+    first_name = serializers.CharField(
+        max_length=150,
+        required=False
+    )
+    last_name = serializers.CharField(
+        max_length=150,
+        required=False
+    )
     username = serializers.CharField(
         max_length=150,
-        validators=[validate_username]
+        required=True,
+        validators=[validate_username, validate_dublicates],
+    )
+    email = serializers.EmailField(
+        max_length=254,
+        required=True,
+        validators=[validate_dublicates]
     )
 
     class Meta:
